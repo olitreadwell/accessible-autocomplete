@@ -429,6 +429,21 @@ describe('Autocomplete', () => {
         })
       })
 
+      describe('with no option selected', () => {
+        it('does not trigger onConfirm', () => {
+          let onConfirmCalled = false
+          const noSelectionAutocomplete = new Autocomplete({
+            ...Autocomplete.defaultProps,
+            id: 'test6',
+            onConfirm: () => { onConfirmCalled = true },
+            source: suggest
+          })
+          noSelectionAutocomplete.setState({ menuOpen: true, options: ['France'], query: 'fr', focused: -1, selected: -1 })
+          noSelectionAutocomplete.handleInputBlur({ relatedTarget: null })
+          expect(onConfirmCalled).to.equal(false)
+        })
+      })
+
       describe('with confirmOnBlur false', () => {
         it('unfocuses component, does not touch query, does not trigger onConfirm', () => {
           confirmOnBlurAutocomplete.setState({ menuOpen: true, options: ['France'], query: 'fr', focused: -1, selected: 0 })

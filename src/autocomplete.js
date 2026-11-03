@@ -167,7 +167,10 @@ export default class Autocomplete extends Component {
     let newQuery
     if (this.props.confirmOnBlur) {
       newQuery = newState.query || query
-      this.props.onConfirm(options[selected])
+      const hasSelectedOption = selected !== null && selected >= 0
+      if (hasSelectedOption) {
+        this.props.onConfirm(options[selected])
+      }
     } else {
       newQuery = query
     }
