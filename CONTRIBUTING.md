@@ -117,45 +117,97 @@ git push --no-verify
 - Updates to the README.md when necessary
 - A 1 line update in CHANGELOG.md describing your changes
 
-## Cutting a new release
+## Publishing a new version of accessible-autocomplete
 
-`git pull --rebase` and then run:
+### Tagging a new release on GitHub
 
-```bash
-git checkout -b "v1.2.3"
-vim CHANGELOG.md # Update CHANGELOG, put all unreleased changes under new heading.
-git commit -am "Update CHANGELOG"
-npm version <major|minor|patch> -m "## 1.2.3 - 2017-01-13
+1. Check out the **main** branch and pull the latest changes.
 
-- Change included in this release
-- Another change included in this release"
-```
+2. Ensure you're running the version of NodeJS matching [`.nvmrc`](/.nvmrc).
 
-Then run:
-```bash
-git push --tags --set-upstream origin refs/heads/v1.2.3:refs/heads/v1.2.3
-```
+   - If you use NVM, run `nvm use` to set up the right version
+   - If you use another management system (like [`asdf`](https://asdf-vm.com/guide/getting-started.html)), compare the output of `node --version` and install the right one if necessary
 
-Create a pull request for the release and merge once it has been approved, then run:
+3. Run `npm ci` to make sure you have the exact dependencies installed.
 
-```bash
-git checkout main
-git pull --rebase
-```
+4. Pick a new version number according to the [versioning documentation](/docs/contributing/versioning.md) and apply it by running:
 
-### Publish the release
+   ```shell
+   npm version <NEW VERSION NUMBER> --no-git-tag-version
+   ```
 
-  1. Sign in to npm (`npm login`) as `govuk-patterns-and-tools` using the credentials from BitWarden.
-  2. Run `npm publish` to publish to npm.
-  3. Open the ['create a new release' dialog](https://github.com/alphagov/accessible-autocomplete/releases/new) on GitHub.
-  4. Select the latest tag version.
-  5. Set 'v[VERSION-NUMBER]' as the title.
-  6. Add the release notes from the changelog.
-  7. Add a summary of highlights.
-  8. Select **Publish release**.
+   This step will update the project's [`package.json`](/package.json) and [`package-lock.json`](/package-lock.json) files.
 
-You do not need to manually attach source code files to the release on GitHub.
+   Do not commit the changes.
+
+5. Create and check out a new branch (`release-[version]`)
+
+   ```shell
+   git switch -c "release-$(npm pkg get version | jq -r 'last(..)')"
+   ```
+
+6. Update the [`CHANGELOG.md`](/CHANGELOG.md) by:
+
+   - changing the 'Unreleased' heading to the new version number and release type. For example, '3.11.0 (Feature release)'
+   - adding a new 'Unreleased' heading above the new version number and release type, so users will know where to add PRs to the changelog
+   - if the changelog has headings from pre-releases, regroup the content under those headings in a single block
+   - saving your changes
+
+7. Commit the changes and push them to GitHub
+
+   ```bash
+   git add .
+   git commit -m "Release v$(npm pkg get version | jq -r 'last(..)')"
+   git push
+   ```
+
+8. Create a pull request
+
+   Use the changelog entry as the summary for the pull request.
+
+   When reviewing the PR, check that the version numbers have been updated.
+
+9. Once a reviewer approves the pull request, merge it to **main**.
+
+10. Create and push the tag for this release
+
+   ```bash
+   git switch main
+   git pull
+   git tag "v$(npm pkg get version | jq -r 'last(..)')"
+   git push --tags
+   ```
+
+### Publish the release to npm
+
+1. Check out the **main** branch and pull the latest changes.
+2. Sign in to npm (`npm login`), using the credentials for the govuk-patterns-and-tools npm user from Bitwarden.
+3. Run `npm publish` to publish to npm.
+4. Verify the presence of the release and its tag on [npm](https://www.npmjs.com/package/accessible-autocomplete?activeTab=versions)
+5. Run `npm logout` to log out from npm in the command line. If you've logged in through your browser, remember to log out from <https://npmjs.com> there as well.
+
+### Create a new release on GitHub
+
+To create a new GitHub release, do the following:
+
+1. Select the tag corresponding to the release in [the list of tags on GitHub](https://github.com/alphagov/accessible-autocomplete/tags)
+2. Press **Create release from tag**
+3. Set `v<VERSION_NUMBER>` as the title
+4. Add release notes from [`CHANGELOG.md`](/CHANGELOG.md)
+5. Publish release
+
+  You do not need to manually attach source code files to the release on GitHub.
+
+### Announce the new release
 
 Post a short summary of the release in the cross-government and GDS #govuk-design-system Slack channels. For example:
 
-🚀 We’ve just released Accessible Autocomplete v2.0.1. You can now use the acccessible autocomplete multiple times on one page. Thanks to @<SLACK-NAME> and @<SLACK-NAME> for helping with this release. [https://github.com/alphagov/accessible-autocomplete/releases/tag/v2.0.1](https://github.com/alphagov/accessible-autocomplete/releases/tag/v2.0.1)
+> 🚀 We’ve just released Accessible Autocomplete v\<VERSION_NUMBER>. 
+>
+> * Summary of change 1
+> * Summary of change 2
+> * ...
+>
+> You can find more details about these changes in [the release’s changelog](https://github.com/alphagov/accessible-autocomplete/releases/tag/v<VERSION_NUMBER>), including how to adjust to the breaking changes.
+>
+> Thanks to @\<SLACK_NAME_OR_GITHUB_NAME> and @\<SLACK_NAME_OR_GITHUB_NAME> for helping with this release.

@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 3.0.2 (Fix release)
+
+### Recommended change
+
+#### Make sure visually hidden elements are not visible when Content Security Policies block inline styles
+
+We've added a new `autocomplete__visually-hidden` class to the component's stylesheet to fix visually hidden elements remaining visible when Content Security Policies block inline styles. 
+
+Make sure you're using the latest version of the [`dist/accessible-autocomplete.min.css` stylesheet](https://github.com/alphagov/accessible-autocomplete/blob/v3.0.2/src/autocomplete.css), which includes the `autocomplete__visually-hidden` class.
+
+We made this change in [pull request #794: Ensure hidden suffix for iOS is not visible when CSP block inline styles](https://github.com/alphagov/accessible-autocomplete/pull/794).
+
+### Fixes
+
+- [Pull request #800: Fix iOS option suffix inline CSS property name](https://github.com/alphagov/accessible-autocomplete/pull/800)
+
 ## 3.0.1 - 2024-09-12
 
 ### Fixes
